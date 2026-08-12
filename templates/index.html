@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Quality Predictor</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #1e1e1e; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); width: 100%; max-width: 700px; }
+        h2 { text-align: center; margin-bottom: 20px; color: #e91e63; font-size: 28px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-size: 13px; margin-bottom: 5px; color: #bbb; }
+        input { padding: 10px; border-radius: 6px; border: 1fr solid #333; background: #2a2a2a; color: #fff; outline: none; }
+        input:focus { border-color: #e91e63; }
+        button { grid-column: span 2; margin-top: 15px; padding: 12px; border: none; border-radius: 6px; background: #e91e63; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #c2185b; }
+        #result { margin-top: 20px; text-align: center; font-size: 20px; font-weight: bold; min-height: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🍷 Wine Quality Predictor</h2>
+    <form id="wineForm">
+        <div class="grid">
+            <div class="input-group"><label>Fixed Acidity</label><input type="number" step="any" id="fixed_acidity" value="7.4" required></div>
+            <div class="input-group"><label>Volatile Acidity</label><input type="number" step="any" id="volatile_acidity" value="0.7" required></div>
+            <div class="input-group"><label>Citric Acid</label><input type="number" step="any" id="citric_acid" value="0.0" required></div>
+            <div class="input-group"><label>Residual Sugar</label><input type="number" step="any" id="residual_sugar" value="1.9" required></div>
+            <div class="input-group"><label>Chlorides</label><input type="number" step="any" id="chlorides" value="0.076" required></div>
+            <div class="input-group"><label>Free Sulfur Dioxide</label><input type="number" step="any" id="free_sulfur_dioxide" value="11" required></div>
+            <div class="input-group"><label>Total Sulfur Dioxide</label><input type="number" step="any" id="total_sulfur_dioxide" value="34" required></div>
+            <div class="input-group"><label>Density</label><input type="number" step="any" id="density" value="0.9978" required></div>
+            <div class="input-group"><label>pH</label><input type="number" step="any" id="pH" value="3.51" required></div>
+            <div class="input-group"><label>Sulphates</label><input type="number" step="any" id="sulphates" value="0.56" required></div>
+            <div class="input-group" style="grid-column: span 2;"><label>Alcohol</label><input type="number" step="any" id="alcohol" value="9.4" required></div>
+        </div>
+        <button type="submit">Predict Quality</button>
+    </form>
+    <div id="result"></div>
+</div>
+
+<script>
+    document.getElementById('wineForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const data = {
+            fixed_acidity: document.getElementById('fixed_acidity').value,
+            volatile_acidity: document.getElementById('volatile_acidity').value,
+            citric_acid: document.getElementById('citric_acid').value,
+            residual_sugar: document.getElementById('residual_sugar').value,
+            chlorides: document.getElementById('chlorides').value,
+            free_sulfur_dioxide: document.getElementById('free_sulfur_dioxide').value,
+            total_sulfur_dioxide: document.getElementById('total_sulfur_dioxide').value,
+            density: document.getElementById('density').value,
+            pH: document.getElementById('pH').value,
+            sulphates: document.getElementById('sulphates').value,
+            alcohol: document.getElementById('alcohol').value
+        };
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerText = "Predicting...";
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const res = await response.json();
+            if (res.status === 'success') {
+                resultDiv.innerText = res.prediction;
+            } else {
+                resultDiv.innerText = "Error processing request.";
+            }
+        } catch (error) {
+            resultDiv.innerText = "Server/Connection Error!";
+        }
+    });
+</script>
+
+</body>
+</html>
